@@ -54,26 +54,27 @@ class WebotsEnv(gym.Env):
 
 # env = WebotsEnv()
 
-commands = [
-    "webots",
-    "--batch",
-    "--no-sandbox",
-    "--stderr",
-    '--stream="port=4000"',
-    "/home/jelgar/Documents/uni/robotics/robo-gen/webots/worlds/labsheet_x.wbt",
-]
+# commands = [
+#     "webots",
+#     "--batch",
+#     "--no-sandbox",
+#     "--stderr",
+#     '--stream="port=4000"',
+#     "/home/jelgar/Documents/uni/robotics/robo-gen/webots/worlds/labsheet_x.wbt",
+# ]
+#
+# subprocess.Popen(commands)
+env = gym.make("CartPole-v1")
 
-subprocess.Popen(commands)
+model = PPO("MlpPolicy", env, verbose=1)
+model.learn(total_timesteps=10000)
 
-# model = PPO("MlpPolicy", env, verbose=1)
-# model.learn(total_timesteps=10000)
+obs = env.reset()
+for i in range(1000):
+    action, _states = model.predict(obs, deterministic=True)
+    obs, reward, done, info = env.step(action)
+    env.render()
+    if done:
+        obs = env.reset()
 
-# obs = env.reset()
-# for i in range(1000):
-#     action, _states = model.predict(obs, deterministic=True)
-#     obs, reward, done, info = env.step(action)
-#     env.render()
-#     if done:
-#         obs = env.reset()
-
-# env.close()
+env.close()
